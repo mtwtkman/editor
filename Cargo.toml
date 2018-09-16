@@ -1,0 +1,12 @@
+[package]
+name = "source"
+version = "0.1.0"
+authors = ["root"]
+
+[dependencies]
+diesel = { version = "*", features = ["sqlite", "chrono"] }
+chrono = { version ="*", features = ["serde"] }
+serde = "*"
+serde_json = "*"
+serde_derive = "*"
+rocket = "*"
