@@ -1,5 +1,5 @@
 create table articles (
-  id integer primary key autoincrement,
+  id integer primary key autoincrement not null,
   title text not null,
   body text not null,
   published boolean not null default false,

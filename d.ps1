@@ -22,4 +22,5 @@ switch ($cmd)
   "diesel" {go "$de diesel $opt"}
   "migration:gen" {go "$migration generate $opt"}
   "migration:run" {go "$migration run"}
+  "migration:redo" {go "$migration redo"}
 }

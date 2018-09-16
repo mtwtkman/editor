@@ -1,6 +1,6 @@
 table! {
     articles (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         title -> Text,
         body -> Text,
         published -> Bool,
@@ -11,7 +11,7 @@ table! {
 
 table! {
     taggings (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         tag_id -> Integer,
         article_id -> Integer,
     }
@@ -19,7 +19,7 @@ table! {
 
 table! {
     tags (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         name -> Text,
     }
 }
