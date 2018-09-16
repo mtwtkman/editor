@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["root"]
 
 [dependencies]
-diesel = { version = "*", features = ["sqlite", "chrono"] }
+diesel = { version = "*", features = ["sqlite", "chrono", "r2d2"] }
 chrono = { version ="*", features = ["serde"] }
 serde = "*"
 serde_json = "*"
