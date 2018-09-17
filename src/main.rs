@@ -1,9 +1,18 @@
+#![allow(unused_imports)]
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
+#![feature(custom_attribute)]
 
+extern crate chrono;
+#[macro_use]
 extern crate diesel;
 extern crate dotenv;
 extern crate rocket;
+extern crate rocket_contrib;
+extern crate serde;
+extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel::SqliteConnection;
@@ -14,12 +23,12 @@ use rocket::{Outcome, Request, State};
 use std::env;
 use std::ops::Deref;
 
-type SqlitePool = Pool<ConnectionManager<SqliteConnection>>;
+mod handlers;
+mod models;
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, World!"
-}
+use handlers::article;
+
+type SqlitePool = Pool<ConnectionManager<SqliteConnection>>;
 
 fn init_pool(database_url: String) -> SqlitePool {
     let manager = ConnectionManager::<SqliteConnection>::new(database_url);
@@ -53,7 +62,7 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     rocket::ignite()
-        .mount("/", routes![index])
+        .mount("/", routes![article::all])
         .manage(init_pool(database_url))
         .launch();
 }

@@ -11,4 +11,5 @@ serde_json = "*"
 serde_derive = "*"
 rocket = "*"
 rocket_codegen = "*"
+rocket_contrib = { version = "*", features = ["json"] }
 dotenv = "*"
