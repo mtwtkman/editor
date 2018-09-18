@@ -14,7 +14,7 @@ function go($cmd)
 switch ($cmd)
 {
   "up" {go "docker run -d --rm -ti --name $name -v ${PWD}:/source -w /source -p 55301:55301 $name sh"}
-  "bash" {go "$de bash"}
+  "sh" {go "$de bash"}
   "build" {go "$de cargo build"}
   "run" {go "$de cargo run"}
   "cargo" {go "$cargo $opt"}

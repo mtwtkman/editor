@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
-use models::schema::articles;
+use models::articles;
 
-#[derive(Queryable, Serialize)]
+#[derive(Identifiable, Queryable, Serialize)]
 pub struct Article {
     pub id: i32,
     pub title: String,

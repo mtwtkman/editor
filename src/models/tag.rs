@@ -1,5 +1,7 @@
-#[derive(Queryable, Deserialize)]
+use models::tags;
+
+#[derive(Identifiable, Queryable, Serialize)]
 pub struct Tag {
-    id: i32,
-    name: String,
+    pub id: i32,
+    pub name: String,
 }

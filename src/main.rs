@@ -62,7 +62,7 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     rocket::ignite()
-        .mount("/", routes![article::all])
+        .mount("/", routes![article::all, article::one])
         .manage(init_pool(database_url))
         .launch();
 }
