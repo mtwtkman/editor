@@ -1,11 +1,8 @@
-use chrono::NaiveDateTime;
+use diesel::insert_into;
 use diesel::prelude::*;
-use diesel::result::Error;
 use diesel::QueryDsl;
-use models::{schema, Article, Tag, Tagging};
-use rocket::http::Status;
-use rocket::response::status::NotFound;
-use rocket::response::Responder;
+use models::{schema, Article, NewArticle, Tag, Tagging};
+use rocket::response::status::{BadRequest, NotFound};
 use rocket_contrib::Json;
 use DbConn;
 
@@ -18,8 +15,14 @@ pub fn all(conn: DbConn) -> Json<Vec<Article>> {
     Json(article_list)
 }
 
+#[derive(Serialize)]
+pub struct OneResponse {
+    pub article: Article,
+    pub tags: Vec<Tag>,
+}
+
 #[get("/<id>")]
-pub fn one(id: i32, conn: DbConn) -> Result<Json<(Article, Vec<Tag>)>, NotFound<String>> {
+pub fn one(id: i32, conn: DbConn) -> Result<Json<OneResponse>, NotFound<String>> {
     schema::articles::table
         .find(id)
         .first::<Article>(&*conn)
@@ -35,6 +38,24 @@ pub fn one(id: i32, conn: DbConn) -> Result<Json<(Article, Vec<Tag>)>, NotFound<
                         .order(schema::tags::id)
                         .load::<Tag>(&*conn)
                 }).or(Ok(vec![]))
-                .map(|tags| Json((article, tags)))
+                .map(|tags| Json(OneResponse { article, tags }))
+        })
+}
+
+#[derive(Serialize)]
+pub struct NewResponse {
+    pub message: String,
+}
+
+#[post("/", format = "application/json", data = "<article>")]
+pub fn new(article: Json<NewArticle>, conn: DbConn) -> Result<Json<NewResponse>, BadRequest<()>> {
+    insert_into(schema::articles::table)
+        .values(&article.0)
+        .execute(&*conn)
+        .map_err(|_| BadRequest::<()>(None))
+        .map(|_| {
+            Json(NewResponse {
+                message: format!("success"),
+            })
         })
 }

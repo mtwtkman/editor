@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use models::articles;
+use models::schema::articles;
 
 #[derive(Identifiable, Queryable, Serialize)]
 pub struct Article {
@@ -9,4 +9,12 @@ pub struct Article {
     pub published: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+#[derive(Insertable, Deserialize)]
+#[table_name = "articles"]
+pub struct NewArticle {
+    pub title: String,
+    pub body: String,
+    pub published: Option<bool>,
 }

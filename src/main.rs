@@ -1,4 +1,3 @@
-#![allow(unused_imports)]
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
 #![feature(custom_attribute)]
@@ -62,7 +61,9 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     rocket::ignite()
-        .mount("/articles", routes![article::all, article::one])
-        .manage(init_pool(database_url))
+        .mount(
+            "/articles",
+            routes![article::all, article::one, article::new],
+        ).manage(init_pool(database_url))
         .launch();
 }
