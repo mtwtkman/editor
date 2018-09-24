@@ -9,3 +9,10 @@ pub struct Tagging {
     pub article_id: i32,
     pub tag_id: i32,
 }
+
+#[derive(Insertable)]
+#[table_name = "taggings"]
+pub struct NewTagging {
+    pub article_id: i32,
+    pub tag_id: i32,
+}

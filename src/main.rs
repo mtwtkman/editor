@@ -1,6 +1,7 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
 #![feature(custom_attribute)]
+#![feature(extern_prelude)]
 
 extern crate chrono;
 #[macro_use]
@@ -63,7 +64,7 @@ fn main() {
     rocket::ignite()
         .mount(
             "/articles",
-            routes![article::all, article::one, article::new],
+            routes![article::all, article::one, article::new, article::update],
         ).manage(init_pool(database_url))
         .launch();
 }

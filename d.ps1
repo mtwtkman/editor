@@ -20,6 +20,7 @@ switch ($cmd)
   "cargo" {go "$cargo $opt"}
   "sqlite" {go "$de sqlite3 $opt"}
   "diesel" {go "$de diesel $opt"}
+  "explain" {go "$de rustc --explain $opt"}
   "migration:gen" {go "$migration generate $opt"}
   "migration:run" {go "$migration run"}
   "migration:redo" {go "$migration redo"}

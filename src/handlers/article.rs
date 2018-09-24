@@ -1,8 +1,7 @@
-use diesel::insert_into;
 use diesel::prelude::*;
 use diesel::QueryDsl;
-use models::{schema, Article, NewArticle, Tag, Tagging};
-use rocket::response::status::{BadRequest, NotFound};
+use models::{schema, Article, ArticleForm, NewTagging, Tag, Tagging};
+use rocket::response::status::{BadRequest, Created, NotFound};
 use rocket_contrib::Json;
 use DbConn;
 
@@ -42,20 +41,47 @@ pub fn one(id: i32, conn: DbConn) -> Result<Json<OneResponse>, NotFound<String>>
         })
 }
 
-#[derive(Serialize)]
-pub struct NewResponse {
-    pub message: String,
-}
-
 #[post("/", format = "application/json", data = "<article>")]
-pub fn new(article: Json<NewArticle>, conn: DbConn) -> Result<Json<NewResponse>, BadRequest<()>> {
-    insert_into(schema::articles::table)
+pub fn new(article: Json<ArticleForm>, conn: DbConn) -> Created<Json<ArticleForm>> {
+    diesel::insert_into(schema::articles::table)
         .values(&article.0)
         .execute(&*conn)
+        .map(|_| Created(format!("success"), Some(Json(article.0))))
+        .unwrap()
+}
+
+#[derive(Deserialize)]
+pub struct UpdateArticle {
+    article: ArticleForm,
+    tag_ids: Vec<i32>,
+}
+
+#[put("/<id>", format = "application/json", data = "<article>")]
+pub fn update(
+    id: i32,
+    article: Json<UpdateArticle>,
+    conn: DbConn,
+) -> Result<Json<String>, BadRequest<()>> {
+    let UpdateArticle { article, tag_ids } = article.0;
+    diesel::update(schema::articles::table)
+        .filter(schema::articles::id.eq(id))
+        .set(&article)
+        .execute(&*conn)
         .map_err(|_| BadRequest::<()>(None))
-        .map(|_| {
-            Json(NewResponse {
-                message: format!("success"),
-            })
+        .and_then(|_| {
+            diesel::delete(schema::taggings::table.filter(schema::taggings::article_id.eq(id)))
+                .execute(&*conn)
+                .expect("Failed to delete article");
+            let values: Vec<NewTagging> = tag_ids
+                .into_iter()
+                .map(|tag_id| NewTagging {
+                    article_id: id,
+                    tag_id,
+                }).collect();
+            diesel::insert_into(schema::taggings::table)
+                .values(&values)
+                .execute(&*conn)
+                .expect("Failed to insert data");
+            Ok(Json(format!("ok")))
         })
 }

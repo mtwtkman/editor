@@ -5,5 +5,5 @@ pub mod tagging;
 
 pub use self::article::*;
 pub use self::schema::*;
-pub use self::tag::Tag;
-pub use self::tagging::Tagging;
+pub use self::tag::*;
+pub use self::tagging::*;
