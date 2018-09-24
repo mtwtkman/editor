@@ -24,6 +24,9 @@ table! {
     }
 }
 
+joinable!(taggings -> articles (article_id));
+joinable!(taggings -> tags (tag_id));
+
 allow_tables_to_appear_in_same_query!(
     articles,
     taggings,

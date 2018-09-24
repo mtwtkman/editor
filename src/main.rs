@@ -64,7 +64,13 @@ fn main() {
     rocket::ignite()
         .mount(
             "/articles",
-            routes![article::all, article::one, article::new, article::update],
+            routes![
+                article::all,
+                article::one,
+                article::new,
+                article::update,
+                article::delete,
+            ],
         ).manage(init_pool(database_url))
         .launch();
 }

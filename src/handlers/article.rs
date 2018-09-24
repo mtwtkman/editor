@@ -85,3 +85,11 @@ pub fn update(
             Ok(Json(format!("ok")))
         })
 }
+
+#[delete("/<id>")]
+pub fn delete(id: i32, conn: DbConn) -> Result<Json<String>, BadRequest<()>> {
+    diesel::delete(schema::articles::table.filter(schema::articles::id.eq(id)))
+        .execute(&*conn)
+        .map_err(|_| BadRequest::<()>(None))
+        .map(|_| Json(format!("ok")))
+}
