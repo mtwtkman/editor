@@ -5,6 +5,7 @@ authors = ["root"]
 
 [dependencies]
 diesel = { version = "*", features = ["sqlite", "chrono", "r2d2"] }
+diesel_migrations = { version = "*", features = ["sqlite"] }
 chrono = { version ="*", features = ["serde"] }
 serde = "*"
 serde_json = "*"
@@ -13,3 +14,6 @@ rocket = "*"
 rocket_codegen = "*"
 rocket_contrib = { version = "*", features = ["json"] }
 dotenv = "*"
+
+[[test]]
+name = "tests"

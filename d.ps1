@@ -24,4 +24,5 @@ switch ($cmd)
   "migration:gen" {go "$migration generate $opt"}
   "migration:run" {go "$migration run"}
   "migration:redo" {go "$migration redo"}
+  "t" {go "$cargo test"}
 }
