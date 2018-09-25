@@ -26,7 +26,7 @@ use std::ops::Deref;
 mod handlers;
 mod models;
 
-use handlers::article;
+use handlers::{article, tag};
 
 type SqlitePool = Pool<ConnectionManager<SqliteConnection>>;
 
@@ -71,6 +71,9 @@ fn main() {
                 article::update,
                 article::delete,
             ],
+        ).mount(
+            "/tags",
+            routes![tag::all, tag::new, tag::delete, tag::update,],
         ).manage(init_pool(database_url))
         .launch();
 }

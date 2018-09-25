@@ -7,11 +7,12 @@ use DbConn;
 
 #[get("/")]
 pub fn all(conn: DbConn) -> Json<Vec<Article>> {
-    let article_list = schema::articles::table
+    schema::articles::table
         .order(schema::articles::created_at.desc())
         .load(&*conn)
-        .unwrap_or(vec![]);
-    Json(article_list)
+        .or::<()>(Ok(vec![]))
+        .map(|articles| Json(articles))
+        .unwrap()
 }
 
 #[derive(Serialize)]

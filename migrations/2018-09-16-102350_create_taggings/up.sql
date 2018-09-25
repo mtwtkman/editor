@@ -1,3 +1,6 @@
+pragma foreign_keys = on
+;
+
 create table taggings (
   id integer primary key autoincrement not null,
   tag_id integer not null references tags(id) on delete cascade,
