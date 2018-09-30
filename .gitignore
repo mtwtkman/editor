@@ -1,5 +1,11 @@
-/target
-**/*.rs.bk
-
-/target
-**/*.rs.bk
+.DS_Store
+.python-version
+venv
+target
+node_modules
+__pycache__
+*.pyc
+*.sqlite3
+test.db
+elm-stuff
+.vscode

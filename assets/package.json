@@ -1,0 +1,20 @@
+{
+  "name": "editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "elm make src/Main.elm --output=index.html",
+    "i": "elm install",
+    "repl": "elm repl",
+    "format": "elm-format src/",
+    "doc": "elm-oracle"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "elm": "^0.19.0-bugfix2",
+    "elm-format": "^0.8.1-rc2",
+    "elm-test": "^0.19.0-beta9"
+  }
+}
