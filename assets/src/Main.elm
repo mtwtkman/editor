@@ -1,85 +1,12 @@
 module Main exposing (main)
 
-import Browser
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Http
-import Json.Decode as Decode exposing (Decoder, bool, int, list, string, succeed)
-import Json.Decode.Pipeline exposing (required)
-
-
-
--- UPDATE
-
-
-type Msg
-    = FetchArticles (Result Http.Error Model)
-
-
-update : Msg -> Model -> ( Model, Cmd msg )
-update msg model =
-    case msg of
-        FetchArticles result ->
-            case result of
-                Ok articles ->
-                    ( articles, Cmd.none )
-
-                Err _ ->
-                    ( model, Cmd.none )
-
-
-
--- MODEL
-
-
-type alias Article =
-    { id : Int
-    , title : String
-    , body : String
-    , published : Bool
-    , created_at : String
-    , updated_at : String
-    }
-
-
-type alias Model =
-    List Article
-
-
-initModel : Model
-initModel =
-    []
-
-
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( initModel, fetchArticles )
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub msg
-subscriptions _ =
-    Sub.none
-
-
-
--- VIEW
-
-
-view : Model -> Html Msg
-view model =
-    div []
-        [ h1 [] [ text "Articles" ]
-        , ul [] (List.map titleView model)
-        ]
-
-
-titleView : Article -> Html Msg
-titleView article =
-    li [] [ text article.title ]
+import Browser exposing (Document, UrlRequest(..))
+import Browser.Navigation as Nav
+import Html exposing (div, h1, text)
+import Page.Article as Article
+import Page.Home as Home
+import Route exposing (Route, fromUrl)
+import Url exposing (Url)
 
 
 
@@ -88,34 +15,130 @@ titleView article =
 
 main : Program () Model Msg
 main =
-    Browser.element
+    Browser.application
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
+        , onUrlRequest = ClickedLink
+        , onUrlChange = ChangedUrl
         }
 
 
 
--- HTTP
+-- MODEL
 
 
-fetchArticles : Cmd Msg
-fetchArticles =
-    Http.send FetchArticles (Http.get "http://localhost:55301/articles" decoder)
+type Model
+    = Home Home.Model
+    | Article Article.Model
+    | NotFound Nav.Key
 
 
-articleDecoder : Decoder Article
-articleDecoder =
-    succeed Article
-        |> required "id" int
-        |> required "title" string
-        |> required "body" string
-        |> required "published" bool
-        |> required "created_at" string
-        |> required "updated_at" string
+init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init _ url navKey =
+    case fromUrl url of
+        Just Route.Home ->
+            let
+                ( model, msg ) =
+                    Home.init navKey
+            in
+            ( Home model, Cmd.map GotHomeMsg msg )
+
+        Just (Route.Article id) ->
+            ( NotFound navKey, Cmd.none )
+
+        Nothing ->
+            ( NotFound navKey, Cmd.none )
 
 
-decoder : Decoder Model
-decoder =
-    list articleDecoder
+
+-- UPDATE
+
+
+type Msg
+    = ClickedLink UrlRequest
+    | ChangedUrl Url
+    | GotHomeMsg Home.Msg
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case ( msg, model ) of
+        ( _, NotFound _ ) ->
+            ( model, Cmd.none )
+
+        ( ClickedLink urlRequest, _ ) ->
+            case urlRequest of
+                Internal url ->
+                    ( model
+                    , Nav.pushUrl (toKey model) (Url.toString url)
+                    )
+
+                External href ->
+                    ( model, Nav.load href )
+
+        ( ChangedUrl url, _ ) ->
+            ( model, Cmd.none )
+
+        ( GotHomeMsg subMsg, Home home ) ->
+            Home.update subMsg home
+                |> updateWith Home GotHomeMsg
+
+        ( _, _ ) ->
+            ( model, Cmd.none )
+
+
+updateWith : (subModel -> Model) -> (subMsg -> Msg) -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
+updateWith toModel toMsg ( subModel, subCmd ) =
+    ( toModel subModel
+    , Cmd.map toMsg subCmd
+    )
+
+
+toKey : Model -> Nav.Key
+toKey page =
+    case page of
+        Home home ->
+            home.key
+
+        Article article ->
+            article.key
+
+        NotFound navKey ->
+            navKey
+
+
+
+-- VIEW
+
+
+view : Model -> Document Msg
+view model =
+    let
+        viewPage toMsg title content =
+            { title = title
+            , body =
+                [ div [] [ h1 [] [ text title ] ]
+                , Html.map toMsg content
+                ]
+            }
+    in
+    case model of
+        Home home ->
+            viewPage GotHomeMsg "Articles" (Home.view home)
+
+        Article article ->
+            { title = "article", body = [ h1 [] [ text "not implemented" ] ] }
+
+        NotFound _ ->
+            { title = "not found", body = [ h1 [] [ text "NOT FOUND" ] ] }
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
