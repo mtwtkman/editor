@@ -1,6 +1,6 @@
 module Route exposing (Route(..), fromUrl, href)
 
-import Article exposing (Id)
+import Article exposing (Id, toStringId)
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 import Url exposing (Url)
@@ -20,7 +20,7 @@ parser : Parser (Route -> a) a
 parser =
     oneOf
         [ Parser.map Home top
-        , Parser.map Article (s "article" </> int)
+        , Parser.map Article (s "articles" </> int)
         ]
 
 
@@ -51,6 +51,6 @@ toString route =
                     []
 
                 Article id ->
-                    [ "article", String.fromInt id ]
+                    [ "articles", toStringId id ]
     in
     "#/" ++ String.join "/" pieces

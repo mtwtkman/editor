@@ -1,6 +1,6 @@
 module Page.Home exposing (Model, Msg, fetchArticles, init, update, view)
 
-import Article exposing (Article)
+import Article exposing (Article, articleDecoder)
 import Browser.Navigation as Nav
 import Html exposing (Html, a, div, h1, li, text, ul)
 import Http
@@ -79,17 +79,6 @@ titleView article =
 fetchArticles : Cmd Msg
 fetchArticles =
     Http.send FetchArticles (Http.get "http://localhost:55301/articles" decoder)
-
-
-articleDecoder : Decoder Article
-articleDecoder =
-    succeed Article
-        |> required "id" int
-        |> required "title" string
-        |> required "body" string
-        |> required "published" bool
-        |> required "created_at" string
-        |> required "updated_at" string
 
 
 decoder : Decoder Articles

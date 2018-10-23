@@ -37,19 +37,7 @@ type Model
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url navKey =
-    case fromUrl url of
-        Just Route.Home ->
-            let
-                ( model, msg ) =
-                    Home.init navKey
-            in
-            ( Home model, Cmd.map GotHomeMsg msg )
-
-        Just (Route.Article id) ->
-            ( NotFound navKey, Cmd.none )
-
-        Nothing ->
-            ( NotFound navKey, Cmd.none )
+    changeRouteTo (Route.fromUrl url) navKey
 
 
 
@@ -60,6 +48,22 @@ type Msg
     = ClickedLink UrlRequest
     | ChangedUrl Url
     | GotHomeMsg Home.Msg
+    | GotArticleMsg Article.Msg
+
+
+changeRouteTo : Maybe Route -> Nav.Key -> ( Model, Cmd Msg )
+changeRouteTo maybeRoute navKey =
+    case maybeRoute of
+        Nothing ->
+            ( NotFound navKey, Cmd.none )
+
+        Just Route.Home ->
+            Home.init navKey
+                |> updateWith Home GotHomeMsg
+
+        Just (Route.Article id) ->
+            Article.init navKey id
+                |> updateWith Article GotArticleMsg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -129,7 +133,7 @@ view model =
             viewPage GotHomeMsg "Articles" (Home.view home)
 
         Article article ->
-            { title = "article", body = [ h1 [] [ text "not implemented" ] ] }
+            viewPage GotArticleMsg "Article" (Article.view article)
 
         NotFound _ ->
             { title = "not found", body = [ h1 [] [ text "NOT FOUND" ] ] }
