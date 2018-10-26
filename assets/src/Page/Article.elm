@@ -1,6 +1,7 @@
-module Page.Article exposing (Model, Msg, init, view)
+module Page.Article exposing (Model, Msg, init, update, view)
 
-import Article exposing (Article, Id, articleDecoder, toStringId)
+import Article exposing (Article, articleDecoder)
+import Article.Id as Id exposing (Id)
 import Browser.Navigation as Nav
 import Html exposing (Html, div, text)
 import Http
@@ -70,9 +71,4 @@ view model =
 
 fetchArticle : Id -> Cmd Msg
 fetchArticle id =
-    Http.send FetchArticle (Http.get ("http://localhost:55301/articles/" ++ toStringId id) decoder)
-
-
-decoder : Decoder Article
-decoder =
-    articleDecoder
+    Http.send FetchArticle (Http.get ("http://lvh.me:55301/articles/" ++ Id.toString id) articleDecoder)

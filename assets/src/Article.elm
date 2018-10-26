@@ -1,15 +1,13 @@
-module Article exposing (Article, Id, articleDecoder, toStringId)
+module Article exposing (Article, articleDecoder)
 
+import Article.Id as Id exposing (Id)
 import Json.Decode as Decode exposing (Decoder, bool, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (required)
+import Url exposing (Url)
 
 
 
 -- TYPE
-
-
-type alias Id =
-    Int
 
 
 type alias Article =
@@ -23,22 +21,13 @@ type alias Article =
 
 
 
--- HELPER
-
-
-toStringId : Id -> String
-toStringId id =
-    String.fromInt id
-
-
-
 -- DECODER
 
 
 articleDecoder : Decoder Article
 articleDecoder =
     succeed Article
-        |> required "id" int
+        |> required "id" Id.decoder
         |> required "title" string
         |> required "body" string
         |> required "published" bool

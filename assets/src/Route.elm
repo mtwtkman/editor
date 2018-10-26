@@ -1,6 +1,6 @@
 module Route exposing (Route(..), fromUrl, href)
 
-import Article exposing (Id, toStringId)
+import Article.Id as Id exposing (Id)
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 import Url exposing (Url)
@@ -20,7 +20,7 @@ parser : Parser (Route -> a) a
 parser =
     oneOf
         [ Parser.map Home top
-        , Parser.map Article (s "articles" </> int)
+        , Parser.map Article (s "articles" </> Id.urlParser)
         ]
 
 
@@ -30,20 +30,21 @@ parser =
 
 href : Route -> Attribute msg
 href route =
-    Attr.href (toString route)
+    Attr.href (routeToString route)
 
 
 fromUrl : Url -> Maybe Route
 fromUrl url =
-    Parser.parse parser url
+    { url | path = Maybe.withDefault "" url.fragment, fragment = Nothing }
+        |> Parser.parse parser
 
 
 
 -- INTERNAL
 
 
-toString : Route -> String
-toString route =
+routeToString : Route -> String
+routeToString route =
     let
         pieces =
             case route of
@@ -51,6 +52,6 @@ toString route =
                     []
 
                 Article id ->
-                    [ "articles", toStringId id ]
+                    [ "articles", Id.toString id ]
     in
-    "#/" ++ String.join "/" pieces
+    "/#/" ++ String.join "/" pieces

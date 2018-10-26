@@ -89,6 +89,10 @@ update msg model =
             Home.update subMsg home
                 |> updateWith Home GotHomeMsg
 
+        ( GotArticleMsg subMsg, Article article ) ->
+            Article.update subMsg article
+                |> updateWith Article GotArticleMsg
+
         ( _, _ ) ->
             ( model, Cmd.none )
 
