@@ -13,13 +13,15 @@ extern crate serde;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
+extern crate rocket_cors;
 
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel::SqliteConnection;
 use dotenv::dotenv;
-use rocket::http::Status;
+use rocket::http::{Method, Status};
 use rocket::request::{self, FromRequest};
 use rocket::{Outcome, Request, State};
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use std::env;
 use std::ops::Deref;
 
@@ -61,6 +63,13 @@ fn main() {
     dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
+    let allowed_origins = AllowedOrigins::all();
+
+    let options = rocket_cors::Cors {
+        allowed_origins: allowed_origins,
+        ..Default::default()
+    };
+
     rocket::ignite()
         .mount(
             "/articles",
@@ -75,5 +84,6 @@ fn main() {
             "/tags",
             routes![tag::all, tag::new, tag::delete, tag::update,],
         ).manage(init_pool(database_url))
+        .attach(options)
         .launch();
 }

@@ -71,4 +71,4 @@ view model =
 
 fetchArticle : Id -> Cmd Msg
 fetchArticle id =
-    Http.send FetchArticle (Http.get ("http://lvh.me:55301/articles/" ++ Id.toString id) articleDecoder)
+    Http.send FetchArticle (Http.get ("http://localhost:55301/articles/" ++ Id.toString id) articleDecoder)

@@ -5851,10 +5851,32 @@ var author$project$Page$Home$FetchArticles = function (a) {
 };
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Page$Home$decoder = elm$json$Json$Decode$list(author$project$Article$articleDecoder);
+var elm$http$Http$Internal$Header = F2(
+	function (a, b) {
+		return {$: 'Header', a: a, b: b};
+	});
+var elm$http$Http$header = elm$http$Http$Internal$Header;
+var author$project$Request$corsGet = F2(
+	function (url, decoder) {
+		return elm$http$Http$request(
+			{
+				body: elm$http$Http$emptyBody,
+				expect: elm$http$Http$expectJson(decoder),
+				headers: _List_fromArray(
+					[
+						A2(elm$http$Http$header, 'Access-Control-Allow-Origin', '*'),
+						A2(elm$http$Http$header, 'Content-Type', 'application/json')
+					]),
+				method: 'get',
+				timeout: elm$core$Maybe$Nothing,
+				url: url,
+				withCredentials: false
+			});
+	});
 var author$project$Page$Home$fetchArticles = A2(
 	elm$http$Http$send,
 	author$project$Page$Home$FetchArticles,
-	A2(elm$http$Http$get, 'http://localhost:55301/articles', author$project$Page$Home$decoder));
+	A2(author$project$Request$corsGet, 'http://localhost:55301/articles', author$project$Page$Home$decoder));
 var author$project$Page$Home$initModel = function (key) {
 	return {articles: _List_Nil, key: key};
 };

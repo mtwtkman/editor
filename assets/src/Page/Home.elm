@@ -6,6 +6,7 @@ import Html exposing (Html, a, div, h1, li, text, ul)
 import Http
 import Json.Decode as Decode exposing (Decoder, bool, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (required)
+import Request exposing (corsGet)
 import Route exposing (href)
 
 
@@ -78,7 +79,7 @@ titleView article =
 
 fetchArticles : Cmd Msg
 fetchArticles =
-    Http.send FetchArticles (Http.get "http://localhost:55301/articles" decoder)
+    Http.send FetchArticles (corsGet "http://localhost:55301/articles" decoder)
 
 
 decoder : Decoder Articles
