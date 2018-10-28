@@ -83,7 +83,7 @@ update msg model =
                     ( model, Nav.load href )
 
         ( ChangedUrl url, _ ) ->
-            ( model, Cmd.none )
+            changeRouteTo (Route.fromUrl url) (toKey model)
 
         ( GotHomeMsg subMsg, Home home ) ->
             Home.update subMsg home

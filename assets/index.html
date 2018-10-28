@@ -5834,7 +5834,7 @@ var author$project$Page$Article$fetchArticle = function (id) {
 		author$project$Page$Article$FetchArticle,
 		A2(
 			elm$http$Http$get,
-			'http://lvh.me:55301/articles/' + author$project$Article$Id$toString(id),
+			'http://localhost:55301/articles/' + author$project$Article$Id$toString(id),
 			author$project$Article$articleDecoder));
 };
 var author$project$Page$Article$initModel = function (key) {
@@ -6525,7 +6525,10 @@ var author$project$Main$update = F2(
 							break _n0$0;
 						} else {
 							var url = _n0.a.a;
-							return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+							return A2(
+								author$project$Main$changeRouteTo,
+								author$project$Route$fromUrl(url),
+								author$project$Main$toKey(model));
 						}
 					case 'GotHomeMsg':
 						switch (_n0.b.$) {
@@ -6563,30 +6566,6 @@ var author$project$Main$update = F2(
 		}
 		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	});
-var elm$html$Html$div = _VirtualDom_node('div');
-var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$Page$Article$view = function (model) {
-	var _n0 = model.article;
-	if (_n0.$ === 'Nothing') {
-		return A2(
-			elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					elm$html$Html$text('fetching...')
-				]));
-	} else {
-		var article = _n0.a;
-		return A2(
-			elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					elm$html$Html$text(article.title)
-				]));
-	}
-};
 var author$project$Route$routeToString = function (route) {
 	var pieces = function () {
 		if (route.$ === 'Home') {
@@ -6621,6 +6600,46 @@ var author$project$Route$href = function (route) {
 		author$project$Route$routeToString(route));
 };
 var elm$html$Html$a = _VirtualDom_node('a');
+var elm$html$Html$div = _VirtualDom_node('div');
+var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var author$project$Page$Article$view = function (model) {
+	var _n0 = model.article;
+	if (_n0.$ === 'Nothing') {
+		return A2(
+			elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('fetching...'),
+							A2(
+							elm$html$Html$a,
+							_List_fromArray(
+								[
+									author$project$Route$href(author$project$Route$Home)
+								]),
+							_List_fromArray(
+								[
+									elm$html$Html$text('back')
+								]))
+						]))
+				]));
+	} else {
+		var article = _n0.a;
+		return A2(
+			elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$text(article.title)
+				]));
+	}
+};
 var elm$html$Html$li = _VirtualDom_node('li');
 var author$project$Page$Home$titleView = function (article) {
 	return A2(

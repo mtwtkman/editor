@@ -3,9 +3,10 @@ module Page.Article exposing (Model, Msg, init, update, view)
 import Article exposing (Article, articleDecoder)
 import Article.Id as Id exposing (Id)
 import Browser.Navigation as Nav
-import Html exposing (Html, div, text)
+import Html exposing (Html, a, div, text)
 import Http
 import Json.Decode exposing (Decoder)
+import Route exposing (href)
 
 
 
@@ -57,7 +58,11 @@ view model =
     case model.article of
         Nothing ->
             div []
-                [ text "fetching..." ]
+                [ div []
+                    [ text "fetching..."
+                    , a [ href Route.Home ] [ text "back" ]
+                    ]
+                ]
 
         Just article ->
             div []
