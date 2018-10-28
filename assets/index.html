@@ -5003,6 +5003,13 @@ var author$project$Main$updateWith = F3(
 			toModel(subModel),
 			A2(elm$core$Platform$Cmd$map, toMsg, subCmd));
 	});
+var author$project$Article$Id$toString = function (_n0) {
+	var id = _n0.a;
+	return elm$core$String$fromInt(id);
+};
+var author$project$Page$Article$FetchArticle = function (a) {
+	return {$: 'FetchArticle', a: a};
+};
 var elm$json$Json$Decode$map2 = _Json_map2;
 var NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = elm$json$Json$Decode$map2(elm$core$Basics$apR);
 var elm$json$Json$Decode$field = _Json_decodeField;
@@ -5054,13 +5061,33 @@ var author$project$Article$articleDecoder = A3(
 						'id',
 						author$project$Article$Id$decoder,
 						elm$json$Json$Decode$succeed(author$project$Article$Article)))))));
-var author$project$Article$Id$toString = function (_n0) {
-	var id = _n0.a;
-	return elm$core$String$fromInt(id);
-};
-var author$project$Page$Article$FetchArticle = function (a) {
-	return {$: 'FetchArticle', a: a};
-};
+var author$project$Page$Article$Data = F2(
+	function (article, tags) {
+		return {article: article, tags: tags};
+	});
+var author$project$Tag$Tag = F2(
+	function (id, name) {
+		return {id: id, name: name};
+	});
+var author$project$Tag$tagDecoder = A3(
+	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'name',
+	elm$json$Json$Decode$string,
+	A3(
+		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'id',
+		elm$json$Json$Decode$int,
+		elm$json$Json$Decode$succeed(author$project$Tag$Tag)));
+var elm$json$Json$Decode$list = _Json_decodeList;
+var author$project$Page$Article$decoder = A3(
+	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'tags',
+	elm$json$Json$Decode$list(author$project$Tag$tagDecoder),
+	A3(
+		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'article',
+		author$project$Article$articleDecoder,
+		elm$json$Json$Decode$succeed(author$project$Page$Article$Data)));
 var elm$http$Http$Internal$EmptyBody = {$: 'EmptyBody'};
 var elm$http$Http$emptyBody = elm$http$Http$Internal$EmptyBody;
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
@@ -5835,10 +5862,10 @@ var author$project$Page$Article$fetchArticle = function (id) {
 		A2(
 			elm$http$Http$get,
 			'http://localhost:55301/articles/' + author$project$Article$Id$toString(id),
-			author$project$Article$articleDecoder));
+			author$project$Page$Article$decoder));
 };
 var author$project$Page$Article$initModel = function (key) {
-	return {article: elm$core$Maybe$Nothing, key: key};
+	return {data: elm$core$Maybe$Nothing, key: key};
 };
 var author$project$Page$Article$init = F2(
 	function (navKey, id) {
@@ -5849,34 +5876,11 @@ var author$project$Page$Article$init = F2(
 var author$project$Page$Home$FetchArticles = function (a) {
 	return {$: 'FetchArticles', a: a};
 };
-var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Page$Home$decoder = elm$json$Json$Decode$list(author$project$Article$articleDecoder);
-var elm$http$Http$Internal$Header = F2(
-	function (a, b) {
-		return {$: 'Header', a: a, b: b};
-	});
-var elm$http$Http$header = elm$http$Http$Internal$Header;
-var author$project$Request$corsGet = F2(
-	function (url, decoder) {
-		return elm$http$Http$request(
-			{
-				body: elm$http$Http$emptyBody,
-				expect: elm$http$Http$expectJson(decoder),
-				headers: _List_fromArray(
-					[
-						A2(elm$http$Http$header, 'Access-Control-Allow-Origin', '*'),
-						A2(elm$http$Http$header, 'Content-Type', 'application/json')
-					]),
-				method: 'get',
-				timeout: elm$core$Maybe$Nothing,
-				url: url,
-				withCredentials: false
-			});
-	});
 var author$project$Page$Home$fetchArticles = A2(
 	elm$http$Http$send,
 	author$project$Page$Home$FetchArticles,
-	A2(author$project$Request$corsGet, 'http://localhost:55301/articles', author$project$Page$Home$decoder));
+	A2(elm$http$Http$get, 'http://localhost:55301/articles', author$project$Page$Home$decoder));
 var author$project$Page$Home$initModel = function (key) {
 	return {articles: _List_Nil, key: key};
 };
@@ -6256,12 +6260,12 @@ var author$project$Page$Article$update = F2(
 	function (msg, model) {
 		var result = msg.a;
 		if (result.$ === 'Ok') {
-			var article = result.a;
+			var data = result.a;
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
 					{
-						article: elm$core$Maybe$Just(article)
+						data: elm$core$Maybe$Just(data)
 					}),
 				elm$core$Platform$Cmd$none);
 		} else {
@@ -6566,6 +6570,23 @@ var author$project$Main$update = F2(
 		}
 		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	});
+var elm$html$Html$div = _VirtualDom_node('div');
+var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var author$project$Page$Article$innerView = function (maybeData) {
+	if (maybeData.$ === 'Nothing') {
+		return A2(elm$html$Html$div, _List_Nil, _List_Nil);
+	} else {
+		var data = maybeData.a;
+		return A2(
+			elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$text(data.article.title)
+				]));
+	}
+};
 var author$project$Route$routeToString = function (route) {
 	var pieces = function () {
 		if (route.$ === 'Home') {
@@ -6600,45 +6621,30 @@ var author$project$Route$href = function (route) {
 		author$project$Route$routeToString(route));
 };
 var elm$html$Html$a = _VirtualDom_node('a');
-var elm$html$Html$div = _VirtualDom_node('div');
-var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var author$project$Page$Article$view = function (model) {
-	var _n0 = model.article;
-	if (_n0.$ === 'Nothing') {
-		return A2(
-			elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					A2(
-					elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text('fetching...'),
-							A2(
-							elm$html$Html$a,
-							_List_fromArray(
-								[
-									author$project$Route$href(author$project$Route$Home)
-								]),
-							_List_fromArray(
-								[
-									elm$html$Html$text('back')
-								]))
-						]))
-				]));
-	} else {
-		var article = _n0.a;
-		return A2(
-			elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					elm$html$Html$text(article.title)
-				]));
-	}
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						author$project$Page$Article$innerView(model.data)
+					])),
+				A2(
+				elm$html$Html$a,
+				_List_fromArray(
+					[
+						author$project$Route$href(author$project$Route$Home)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('back')
+					]))
+			]));
 };
 var elm$html$Html$li = _VirtualDom_node('li');
 var author$project$Page$Home$titleView = function (article) {
@@ -6660,7 +6666,6 @@ var author$project$Page$Home$titleView = function (article) {
 					]))
 			]));
 };
-var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$ul = _VirtualDom_node('ul');
 var author$project$Page$Home$view = function (model) {
 	return A2(
@@ -6669,18 +6674,12 @@ var author$project$Page$Home$view = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				elm$html$Html$h1,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text('')
-					])),
-				A2(
 				elm$html$Html$ul,
 				_List_Nil,
 				A2(elm$core$List$map, author$project$Page$Home$titleView, model.articles))
 			]));
 };
+var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var elm$html$Html$map = elm$virtual_dom$VirtualDom$map;
 var author$project$Main$view = function (model) {

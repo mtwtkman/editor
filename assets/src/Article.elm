@@ -3,7 +3,6 @@ module Article exposing (Article, articleDecoder)
 import Article.Id as Id exposing (Id)
 import Json.Decode as Decode exposing (Decoder, bool, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (required)
-import Url exposing (Url)
 
 
 

@@ -2,11 +2,9 @@ module Page.Home exposing (Model, Msg, fetchArticles, init, update, view)
 
 import Article exposing (Article, articleDecoder)
 import Browser.Navigation as Nav
-import Html exposing (Html, a, div, h1, li, text, ul)
+import Html exposing (Html, a, div, li, text, ul)
 import Http
-import Json.Decode as Decode exposing (Decoder, bool, int, list, string, succeed)
-import Json.Decode.Pipeline exposing (required)
-import Request exposing (corsGet)
+import Json.Decode as Decode exposing (Decoder, list)
 import Route exposing (href)
 
 
@@ -61,8 +59,7 @@ init navKey =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [] [ text "" ]
-        , ul [] (List.map titleView model.articles)
+        [ ul [] (List.map titleView model.articles)
         ]
 
 
@@ -79,7 +76,7 @@ titleView article =
 
 fetchArticles : Cmd Msg
 fetchArticles =
-    Http.send FetchArticles (corsGet "http://localhost:55301/articles" decoder)
+    Http.send FetchArticles (Http.get "http://localhost:55301/articles" decoder)
 
 
 decoder : Decoder Articles
