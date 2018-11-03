@@ -2,7 +2,7 @@ module Page.Home exposing (Model, Msg, fetchArticles, init, update, view)
 
 import Article exposing (Article, articleDecoder)
 import Browser.Navigation as Nav
-import Html exposing (Html, a, div, li, text, ul)
+import Html exposing (Html, a, li, text, ul)
 import Http
 import Json.Decode as Decode exposing (Decoder, list)
 import Route exposing (href)
@@ -58,15 +58,16 @@ init navKey =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ ul [] (List.map titleView model.articles)
-        ]
+    ul [] <|
+        List.map
+            titleView
+            model.articles
 
 
 titleView : Article -> Html Msg
 titleView article =
     li []
-        [ a [ href (Route.Article article.id) ] [ text article.title ]
+        [ a [ href <| Route.Article article.id ] [ text article.title ]
         ]
 
 

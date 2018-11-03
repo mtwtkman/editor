@@ -1,4 +1,4 @@
-module Article.Id exposing (Id, decoder, toString, urlParser)
+module Article.Id exposing (Id(..), decoder, toString, urlParser)
 
 import Json.Decode as Decode exposing (Decoder)
 import Maybe exposing (andThen)

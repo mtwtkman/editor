@@ -1,8 +1,12 @@
 module Main exposing (main)
 
+import Bootstrap.CDN as CDN
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
-import Html exposing (div, h1, text)
+import Html exposing (Html, text)
 import Page.Article as Article
 import Page.Home as Home
 import Route exposing (Route, fromUrl)
@@ -127,20 +131,31 @@ view model =
         viewPage toMsg title content =
             { title = title
             , body =
-                [ div [] [ h1 [] [ text title ] ]
-                , Html.map toMsg content
+                [ Grid.container []
+                    [ Grid.row
+                        [ Row.topXs ]
+                        [ Grid.col
+                            []
+                            [ text title ]
+                        , Grid.col [] [ Html.map toMsg content ]
+                        ]
+                    ]
                 ]
             }
     in
     case model of
         Home home ->
-            viewPage GotHomeMsg "Articles" (Home.view home)
+            viewPage GotHomeMsg "Articles" <| Home.view home
 
         Article article ->
-            viewPage GotArticleMsg "Article" (Article.view article)
+            viewPage GotArticleMsg "" <| Article.view article
 
         NotFound _ ->
-            { title = "not found", body = [ h1 [] [ text "NOT FOUND" ] ] }
+            { title = "not found"
+            , body =
+                [ text "NOT FOUND"
+                ]
+            }
 
 
 

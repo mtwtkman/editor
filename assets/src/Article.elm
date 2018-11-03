@@ -1,6 +1,6 @@
-module Article exposing (Article, articleDecoder)
+module Article exposing (Article, articleDecoder, empty)
 
-import Article.Id as Id exposing (Id)
+import Article.Id as Id
 import Json.Decode as Decode exposing (Decoder, bool, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (required)
 
@@ -10,12 +10,27 @@ import Json.Decode.Pipeline exposing (required)
 
 
 type alias Article =
-    { id : Id
+    { id : Id.Id
     , title : String
     , body : String
     , published : Bool
     , created_at : String
     , updated_at : String
+    }
+
+
+
+-- EMPTY
+
+
+empty : Article
+empty =
+    { id = Id.Id 1
+    , title = ""
+    , body = ""
+    , published = False
+    , created_at = ""
+    , updated_at = ""
     }
 
 
