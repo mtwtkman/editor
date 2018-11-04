@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Article exposing (empty)
 import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
@@ -134,10 +135,7 @@ view model =
                 [ Grid.container []
                     [ Grid.row
                         [ Row.topXs ]
-                        [ Grid.col
-                            []
-                            [ text title ]
-                        , Grid.col [] [ Html.map toMsg content ]
+                        [ Grid.col [] [ Html.map toMsg content ]
                         ]
                     ]
                 ]
@@ -148,7 +146,12 @@ view model =
             viewPage GotHomeMsg "Articles" <| Home.view home
 
         Article article ->
-            viewPage GotArticleMsg "" <| Article.view article
+            let
+                title =
+                    .title <|
+                        Maybe.withDefault empty (Maybe.map (\d -> d.article) article.data)
+            in
+            viewPage GotArticleMsg title <| Article.view article
 
         NotFound _ ->
             { title = "not found"
