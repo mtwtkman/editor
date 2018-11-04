@@ -1,4 +1,4 @@
-module Tag exposing (Tag, tagDecoder)
+module Tag exposing (Tag, tagDecoder, toString)
 
 import Json.Decode as Decode exposing (Decoder, int, string, succeed)
 import Json.Decode.Pipeline exposing (required)
@@ -12,6 +12,15 @@ type alias Tag =
     { id : Int
     , name : String
     }
+
+
+
+-- HELPERS
+
+
+toString : Tag -> String
+toString tag =
+    tag.name
 
 
 

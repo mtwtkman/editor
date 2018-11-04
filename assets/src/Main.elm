@@ -1,12 +1,11 @@
 module Main exposing (main)
 
 import Article exposing (empty)
-import Bootstrap.CDN as CDN
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
+import Bulma.CDN as CDN
+import Bulma.Columns as Columns
+import Bulma.Layout as Layout
 import Html exposing (Html, text)
 import Page.Article as Article
 import Page.Home as Home
@@ -132,10 +131,15 @@ view model =
         viewPage toMsg title content =
             { title = title
             , body =
-                [ Grid.container []
-                    [ Grid.row
-                        [ Row.topXs ]
-                        [ Grid.col [] [ Html.map toMsg content ]
+                [ Layout.fluidContainer []
+                    [ CDN.stylesheet
+                    , Columns.columns
+                        Columns.columnsModifiers
+                        []
+                        [ Columns.column
+                            Columns.columnModifiers
+                            []
+                            [ Html.map toMsg content ]
                         ]
                     ]
                 ]

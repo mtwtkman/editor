@@ -2,17 +2,19 @@ module Page.Article exposing (Model, Msg, init, update, view)
 
 import Article exposing (Article, articleDecoder, empty)
 import Article.Id as Id exposing (Id)
-import Bootstrap.Form.Input as Input
-import Bootstrap.Form.Textarea as Textarea
-import Bootstrap.Grid as Grid
 import Browser.Navigation as Nav
+import Bulma.Columns as Columns
+import Bulma.Elements as Elements
+import Bulma.Form as Form
 import Html exposing (Html, a, div, text)
+import Html.Attributes as Attributes
+import Html.Events as Events
 import Http
 import Json.Decode exposing (Decoder, list, succeed)
 import Json.Decode.Pipeline exposing (required)
 import Markdown exposing (toHtml)
 import Route exposing (href)
-import Tag exposing (Tag, tagDecoder)
+import Tag as Tag exposing (Tag, tagDecoder)
 
 
 
@@ -22,6 +24,7 @@ import Tag exposing (Tag, tagDecoder)
 type Msg
     = FetchArticle (Result Http.Error Data)
     | UpdateTitle String
+    | UpdateTags String
     | UpdateBody String
 
 
@@ -49,6 +52,21 @@ update msg model =
                                     { old | title = title }
                             in
                             { d | article = new }
+                        )
+                        model.data
+            in
+            ( { model | data = newData }, Cmd.none )
+
+        UpdateTags tags ->
+            let
+                newData =
+                    Maybe.map
+                        (\d ->
+                            let
+                                new =
+                                    List.map (\t -> { id = 0, name = t }) (String.split " " <| String.trim tags)
+                            in
+                            { d | tags = new }
                         )
                         model.data
             in
@@ -122,54 +140,110 @@ view model =
                     data
     in
     div []
-        [ Grid.row []
-            [ Grid.col []
+        [ Columns.columns
+            Columns.columnsModifiers
+            []
+            [ Columns.column
+                Columns.columnModifiers
+                []
                 [ titleView article.title
-                , tagsView tags
-                , Grid.row []
-                    [ Grid.col []
-                        [ editorView article.body
-                        , previewView article.body
-                        ]
-                    ]
-                , a [ href Route.Home ] [ text "back" ]
                 ]
+            ]
+        , Columns.columns
+            Columns.columnsModifiers
+            []
+            [ Columns.column
+                Columns.columnModifiers
+                []
+                [ tagsView tags
+                ]
+            ]
+        , Columns.columns
+            Columns.columnsModifiers
+            []
+            (List.map
+                (\v -> Columns.column Columns.columnModifiers [] [ v article.body ])
+                [ editorView, previewView ]
+            )
+        , Columns.columns
+            Columns.columnsModifiers
+            []
+            [ backToHome
             ]
         ]
 
 
 titleView : String -> Html Msg
 titleView title =
-    Input.text
-        [ Input.onInput UpdateTitle
-        , Input.value title
+    let
+        controlAttrs =
+            []
+
+        inputAttrs =
+            [ Events.onInput UpdateTitle
+            , Attributes.value title
+            ]
+    in
+    Form.field []
+        [ Form.controlText
+            Form.controlInputModifiers
+            controlAttrs
+            inputAttrs
+            []
         ]
 
 
 tagsView : List Tag -> Html Msg
 tagsView tags =
-    Grid.row [] <|
-        List.map
-            tagView
-            tags
+    let
+        controlAttrs =
+            []
 
-
-tagView : Tag -> Grid.Column Msg
-tagView tag =
-    Grid.col [] <| [ text tag.name ]
+        inputAttrs =
+            [ Events.onInput UpdateTags
+            , Attributes.value <| String.join " " (List.map Tag.toString tags)
+            ]
+    in
+    Form.field []
+        [ Form.controlText
+            Form.controlInputModifiers
+            controlAttrs
+            inputAttrs
+            []
+        ]
 
 
 editorView : String -> Html Msg
 editorView body =
-    Textarea.textarea
-        [ Textarea.onInput UpdateBody
-        , Textarea.value body
+    let
+        controlAttrs =
+            []
+
+        inputAttrs =
+            [ Events.onInput UpdateBody
+            , Attributes.value body
+            ]
+    in
+    Form.field []
+        [ Form.controlTextArea
+            Form.controlTextAreaModifiers
+            controlAttrs
+            inputAttrs
+            []
         ]
 
 
 previewView : String -> Html Msg
 previewView body =
     toHtml [] body
+
+
+backToHome : Html Msg
+backToHome =
+    Elements.button
+        Elements.buttonModifiers
+        [ href Route.Home ]
+        [ text "back to Home" ]
 
 
 
