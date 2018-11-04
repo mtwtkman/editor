@@ -6,7 +6,7 @@ import Browser.Navigation as Nav
 import Bulma.Columns as Columns
 import Bulma.Elements as Elements
 import Bulma.Form as Form
-import Html exposing (Html, a, div, text)
+import Html exposing (Attribute, Html, a, div, text)
 import Html.Attributes as Attributes
 import Html.Events as Events
 import Http
@@ -213,18 +213,32 @@ tagsView tags =
         ]
 
 
+fullHeight : Attribute msg
+fullHeight =
+    Attributes.style "height" "100%"
+
+
+fullMaxHeight : Attribute msg
+fullMaxHeight =
+    Attributes.style "max-height" "100%"
+
+
 editorView : String -> Html Msg
 editorView body =
     let
         controlAttrs =
-            []
+            [ fullHeight
+            , fullMaxHeight
+            ]
 
         inputAttrs =
             [ Events.onInput UpdateBody
             , Attributes.value body
+            , fullHeight
+            , fullMaxHeight
             ]
     in
-    Form.field []
+    Form.field [ fullHeight, fullMaxHeight ]
         [ Form.controlTextArea
             Form.controlTextAreaModifiers
             controlAttrs
