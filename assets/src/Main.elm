@@ -153,7 +153,9 @@ view model =
             let
                 title =
                     .title <|
-                        Maybe.withDefault empty (Maybe.map (\d -> d.article) article.data)
+                        Maybe.withDefault
+                            empty
+                            (Maybe.map (\d -> d.article) article.data)
             in
             viewPage GotArticleMsg title <| Article.view article
 

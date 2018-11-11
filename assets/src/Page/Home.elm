@@ -2,6 +2,7 @@ module Page.Home exposing (Model, Msg, fetchArticles, init, update, view)
 
 import Article exposing (Article, articleDecoder)
 import Browser.Navigation as Nav
+import Const exposing (article_endpoint)
 import Html exposing (Html, a, li, text, ul)
 import Http
 import Json.Decode as Decode exposing (Decoder, list)
@@ -77,7 +78,7 @@ titleView article =
 
 fetchArticles : Cmd Msg
 fetchArticles =
-    Http.send FetchArticles (Http.get "http://localhost:55301/articles" decoder)
+    Http.send FetchArticles (Http.get article_endpoint decoder)
 
 
 decoder : Decoder Articles

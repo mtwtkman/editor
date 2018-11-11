@@ -4,17 +4,21 @@ import Article exposing (Article, articleDecoder, empty)
 import Article.Id as Id exposing (Id)
 import Browser.Navigation as Nav
 import Bulma.Columns as Columns
-import Bulma.Elements as Elements
+import Bulma.Elements as Elements exposing (buttonModifiers)
 import Bulma.Form as Form
+import Bulma.Modifiers as Modifiers
+import Const exposing (article_endpoint)
 import Html exposing (Attribute, Html, a, div, text)
 import Html.Attributes as Attributes
 import Html.Events as Events
-import Http
+import Http as Http exposing (Body, Request, expectStringResponse, jsonBody)
 import Json.Decode exposing (Decoder, list, succeed)
 import Json.Decode.Pipeline exposing (required)
+import Json.Encode as Encode exposing (bool, int, object, string)
 import Markdown exposing (toHtml)
 import Route exposing (href)
 import Tag as Tag exposing (Tag, tagDecoder)
+import Url.Builder exposing (absolute)
 
 
 
@@ -26,6 +30,8 @@ type Msg
     | UpdateTitle String
     | UpdateTags String
     | UpdateBody String
+    | RequestUpdateArticle
+    | UpdateArticle (Result Http.Error ())
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -89,6 +95,12 @@ update msg model =
                         model.data
             in
             ( { model | data = newData }, Cmd.none )
+
+        RequestUpdateArticle ->
+            ( model, updateArticle model )
+
+        UpdateArticle result ->
+            ( model, Cmd.none )
 
 
 
@@ -167,8 +179,12 @@ view model =
             )
         , Columns.columns
             Columns.columnsModifiers
-            []
-            [ backToHome
+            [ Modifiers.pulledRight ]
+            [ Elements.buttons Modifiers.Right
+                []
+                [ updateButton
+                , backToHome
+                ]
             ]
         ]
 
@@ -254,19 +270,60 @@ previewView body =
 
 backToHome : Html Msg
 backToHome =
-    Elements.button
-        Elements.buttonModifiers
-        [ href Route.Home ]
+    a
+        [ href Route.Home
+        , Attributes.class "button"
+        ]
         [ text "back to Home" ]
+
+
+updateButton : Html Msg
+updateButton =
+    Elements.button
+        { buttonModifiers | color = Modifiers.Primary }
+        [ Events.onClick RequestUpdateArticle ]
+        [ text "update" ]
 
 
 
 -- HTTP
 
 
+toUrl : Id -> String
+toUrl id =
+    String.join "/" [ article_endpoint, Id.toString id ]
+
+
 fetchArticle : Id -> Cmd Msg
 fetchArticle id =
-    Http.send FetchArticle (Http.get ("http://localhost:55301/articles/" ++ Id.toString id) decoder)
+    Http.send FetchArticle (Http.get (toUrl id) decoder)
+
+
+put : String -> Body -> Request ()
+put url body =
+    Http.request
+        { method = "PUT"
+        , headers = []
+        , url = url
+        , body = body
+        , expect = expectStringResponse (\_ -> Ok ())
+        , timeout = Nothing
+        , withCredentials = False
+        }
+
+
+updateArticle : Model -> Cmd Msg
+updateArticle model =
+    case model.data of
+        Just data ->
+            let
+                body =
+                    jsonBody <| encoder data
+            in
+            Http.send UpdateArticle (put (toUrl data.article.id) body)
+
+        Nothing ->
+            Cmd.none
 
 
 decoder : Decoder Data
@@ -274,3 +331,29 @@ decoder =
     succeed Data
         |> required "article" articleDecoder
         |> required "tags" (list tagDecoder)
+
+
+encoder : Data -> Encode.Value
+encoder data =
+    let
+        article =
+            object
+                [ ( "id", Id.encoder data.article.id )
+                , ( "title", string data.article.title )
+                , ( "body", string data.article.body )
+                , ( "published", bool data.article.published )
+                , ( "created_at", string data.article.created_at )
+                , ( "updated_at", string data.article.updated_at )
+                ]
+
+        tag_ids =
+            Encode.list
+                (\t ->
+                    int t.id
+                )
+                data.tags
+    in
+    object
+        [ ( "article", article )
+        , ( "tag_ids", tag_ids )
+        ]
