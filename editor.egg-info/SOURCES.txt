@@ -1,0 +1,6 @@
+editor.egg-info/PKG-INFO
+editor.egg-info/SOURCES.txt
+editor.egg-info/dependency_links.txt
+editor.egg-info/entry_points.txt
+editor.egg-info/requires.txt
+editor.egg-info/top_level.txt
