@@ -27,6 +27,7 @@ def upgrade():
         sa.Column('published', sa.Boolean, nullable=False, default=sa.ColumnDefault(False)),
         sa.Column('created_at', sa.TIMESTAMP, default=lambda: datetime.now(), nullable=False),
         sa.Column('updated_at', sa.TIMESTAMP, default=lambda: datetime.now(), nullable=False),
+        sqlite_autoincrement=True,
     )
 
     op.create_table(
