@@ -11,18 +11,23 @@ requirements = [
     'alembic',
 ]
 
-test_requires = [
+tests_require = [
     'pytest',
 ]
 
 
+extras_require = {
+    'test': tests_require,
+}
+
 setup(
-    name='editor',
+    name='edt',
     install_requires=requirements,
-    test_require=test_requires,
+    tests_require=tests_require,
+    extras_require=extras_require,
     entry_points={
         'paste.app_factory': [
-            'main = editor:main',
+            'main = edt:main',
         ],
     },
 )

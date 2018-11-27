@@ -37,8 +37,9 @@ def upgrade():
 
     op.create_table(
         'taggings',
+        sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('article_id', sa.Integer, sa.ForeignKey('articles.id'), nullable=False),
-        sa.Column('tag_name', sa.String(), sa.ForeignKey('tags.id'), nullable=False),
+        sa.Column('tag_name', sa.String(), sa.ForeignKey('tags.name'), nullable=False),
     )
 
 

@@ -13,7 +13,7 @@ class Query(graphene.ObjectType):
 schema = graphene.Schema(query=Query)
 
 
-@view_config(route_name='index')
+@view_config(route_name='graphql')
 def index(request):
     context = {'name': 'hoge'}
     return serve_graphql_request(request, schema, context_value=context)

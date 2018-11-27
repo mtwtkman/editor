@@ -1,7 +1,0 @@
-alembic
-graphene-sqlalchemy
-pyramid
-pyramid_tm
-waitress
-webob-graphql
-zope.sqlalchemy

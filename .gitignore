@@ -10,3 +10,5 @@ test.db
 elm-stuff
 .vscode
 v
+edt.egg-info
+test-blog.db
