@@ -2,6 +2,7 @@ from unittest import TestCase
 import os
 from pathlib import Path
 
+import transaction
 from pyramid import testing
 from sqlalchemy import engine_from_config
 from pyramid.paster import get_appsettings
@@ -29,5 +30,7 @@ class BaseTestCase(TestCase):
         self.config = testing.setUp()
 
     def tearDown(self):
+        for t in reversed(Base.metadata.sorted_tables):
+            self.session.execute(t.delete())
         self.session.remove()
         testing.tearDown()

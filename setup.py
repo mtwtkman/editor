@@ -13,7 +13,6 @@ requirements = [
 
 tests_require = [
     'pytest',
-    'factory_boy',
 ]
 
 

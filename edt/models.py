@@ -42,7 +42,7 @@ class Article(Base):
     created_at = Column(TIMESTAMP, default=datetime.now, nullable=False)
     updated_at = Column(TIMESTAMP, default=datetime.now, nullable=False)
 
-    tags = relationship('Tag', secondary=taggings, backref="tags")
+    tags = relationship('Tag', secondary=taggings, backref='tags')
 
 
 class Tag(Base):
