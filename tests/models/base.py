@@ -1,13 +1,14 @@
 from unittest import TestCase
 import os
 from pathlib import Path
+from typing import List
 
 import transaction
 from pyramid import testing
 from sqlalchemy import engine_from_config
 from pyramid.paster import get_appsettings
 
-from edt.models import DBSession, Base
+from edt.models import DBSession, Base, Article, Tag
 
 
 here = Path(os.path.dirname(__file__))
@@ -34,3 +35,22 @@ class BaseTestCase(TestCase):
             self.session.execute(t.delete())
         self.session.remove()
         testing.tearDown()
+
+
+class fixture:
+    def insert(self):
+        self.article_data = [Article(title=f'title{i}', body=f'body{i}') for i in range(10)]
+        self.tag_data = [Tag(name=f'tag{i}') for i in range(10)]
+        self.session.add_all(self.article_data)
+        self.session.add_all(self.tag_data)
+        self.tagged_article_data = self.article_data[:3]
+        self.tagged_tag_data = self.tag_data[:3]
+        for x in self.tagged_article_data:
+            x.tags = self.tagged_tag_data
+
+
+class assertFields:
+    def assertAttrsOf(self, fields: List[str], results, expected):
+        for r, e in zip(results, expected):
+            for a in fields:
+                self.assertEqual(getattr(r, a), getattr(e, a))

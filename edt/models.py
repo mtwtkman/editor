@@ -48,3 +48,5 @@ class Article(Base):
 class Tag(Base):
     __tablename__ = 'tags'
     name = Column(String, primary_key=True)
+
+    articles = relationship('Article', secondary=taggings, backref='articles')

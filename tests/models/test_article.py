@@ -1,28 +1,18 @@
 import transaction
 
-from sqlalchemy.exc import OperationalError
 from sqlalchemy import update
 
 from edt.models import Article, Tag
-from tests.models.base import BaseTestCase
+from tests.models.base import BaseTestCase, fixture, assertFields
 
 
-class TestSelect(BaseTestCase):
+class TestSelect(fixture, assertFields, BaseTestCase):
     def setUp(self):
         super().setUp()
-        self.article_data = [Article(title=f'title{i}', body=f'body{i}') for i in range(10)]
-        self.tag_data = [Tag(name=f'tag{i}') for i in range(10)]
-        self.session.add_all(self.article_data)
-        self.session.add_all(self.tag_data)
-
-        self.tagged_article_data = self.article_data[:3]
-        for x in self.tagged_article_data:
-            x.tags = self.tag_data[:3]
+        self.insert()
 
     def assertAttrs(self, results, expected):
-        for r, e in zip(results, expected):
-            for a in ['title', 'body']:
-                self.assertEqual(getattr(r, a), getattr(e, a))
+        self.assertAttrsOf(['title', 'body'], results, expected)
 
     def test_one(self):
         expected = self.article_data[0]
