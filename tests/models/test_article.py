@@ -3,7 +3,7 @@ import transaction
 from sqlalchemy import update
 
 from edt.models import Article, Tag
-from tests.models.base import BaseTestCase, fixture, assertFields
+from tests.base import BaseTestCase, fixture, assertFields
 
 
 class TestSelect(fixture, assertFields, BaseTestCase):

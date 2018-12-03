@@ -12,7 +12,7 @@ from edt.models import DBSession, Base, Article, Tag
 
 
 here = Path(os.path.dirname(__file__))
-settings = get_appsettings(str(here / '..' / '..' / 'test.ini'))
+settings = get_appsettings(str(here / '..' / 'test.ini'))
 
 
 class BaseTestCase(TestCase):

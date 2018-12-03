@@ -21,6 +21,7 @@ DBSession = scoped_session(
     sessionmaker(extension=ZopeTransactionExtension())
 )
 Base = declarative_base()
+Base.query = DBSession.query_property()
 
 
 taggings = Table(

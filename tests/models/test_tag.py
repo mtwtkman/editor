@@ -1,4 +1,4 @@
-from tests.models.base import BaseTestCase, fixture, assertFields
+from tests.base import BaseTestCase, fixture, assertFields
 from edt.models import Tag
 
 
