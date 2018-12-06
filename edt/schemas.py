@@ -59,8 +59,10 @@ class CreateArticle(graphene.Mutation):
 
     Output = Article
 
-    def mutate(self, info, article):
-        # target.tags = [Tag(**x) for x in tags]
+    def mutate(self, info, article, tags):
+
+        import pdb; pdb.set_trace()
+
         session.add(models.Article(**article))
         created = session.query(models.Article).order_by(desc(models.Article.id)).first()
         return created
