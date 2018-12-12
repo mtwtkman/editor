@@ -31,8 +31,7 @@ class BaseTestCase(TestCase):
         self.config = testing.setUp()
 
     def tearDown(self):
-        for t in reversed(Base.metadata.sorted_tables):
-            self.session.execute(t.delete())
+        self.session.rollback()
         self.session.close()
         testing.tearDown()
 

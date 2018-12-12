@@ -1,3 +1,5 @@
+import pytest
+
 from tests.base import BaseTestCase
 from edt.models import Article, Tag
 from tests.schemas.base import CallFunc
@@ -9,6 +11,7 @@ class TestMutation(CallFunc, BaseTestCase):
         self.x = 1
         self.created_tag_name = 'x'
         self.session.add(Tag(name=self.created_tag_name))
+        self.session.flush()
 
     def t(self, tags):
         return f'''[{','.join([f'{{name: "{t}"}}' for t in tags])}]'''
@@ -32,7 +35,8 @@ class TestMutation(CallFunc, BaseTestCase):
         '''
 
     def assertProps(self, result, expected):
-        created = self.session.query(Article).filter(Article.id == result.data['createArticle']['id']).one()
+        created = self.session.query(Article) \
+            .filter(Article.id == result.data['createArticle']['id']).one()
         self.assertEqual(created.title, expected['title'])
         self.assertEqual(created.body, expected['body'])
         self.assertEqual([x.name for x in created.tags], expected['tags'])
@@ -44,6 +48,7 @@ class TestMutation(CallFunc, BaseTestCase):
         result = self._callFUT(self.q(title, body))
         self.assertProps(result, {'title': title, 'body': body, 'tags': []})
 
+    @pytest.mark.only
     def test_new_article_with_new_tags(self):
         title = 'hoge'
         body = 'fuga'
@@ -52,7 +57,8 @@ class TestMutation(CallFunc, BaseTestCase):
             title,
             body,
             tags,
-            ['id', 'title', 'body', 'published', 'createdAt', 'tags {\nname\n}'],
+            ['id', 'title', 'body', 'published',
+                'createdAt', 'tags {\nname\n}'],
         ))
         self.assertProps(result, {'title': title, 'body': body, 'tags': tags})
 
@@ -64,6 +70,7 @@ class TestMutation(CallFunc, BaseTestCase):
             title,
             body,
             tags,
-            ['id', 'title', 'body', 'published', 'createdAt', 'tags {\nname\n}'],
+            ['id', 'title', 'body', 'published',
+                'createdAt', 'tags {\nname\n}'],
         ))
         self.assertProps(result, {'title': title, 'body': body, 'tags': tags})

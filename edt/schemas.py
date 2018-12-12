@@ -64,9 +64,9 @@ class CreateArticle(graphene.Mutation):
 
     def mutate(self, info, article, tags=None):
         tag_data = [models.Tag(**t) for t in tags or []]
-        stmt = models.Tag.__table__.insert(bind=session.bind) \
-            .prefix_with('OR IGNORE').values(tags)
-        session.execute(stmt)
+        # stmt = models.Tag.__table__.insert(bind=session.bind) \
+        #     .prefix_with('OR IGNORE').values(tags)
+        # session.execute(stmt)
         data = models.Article(**article)
         data.tags = tag_data
         session.add(data)
