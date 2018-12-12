@@ -3,7 +3,7 @@ from tests.schemas.base import CallFunc
 from edt.models import Article, Tag
 
 
-class TestQuery(fixture,CallFunc, BaseTestCase):
+class TestQuery(fixture, CallFunc, BaseTestCase):
     def setUp(self):
         super().setUp()
         self.insert()

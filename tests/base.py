@@ -3,12 +3,11 @@ import os
 from pathlib import Path
 from typing import List
 
-import transaction
 from pyramid import testing
 from sqlalchemy import engine_from_config
 from pyramid.paster import get_appsettings
 
-from edt.models import DBSession, Base, Article, Tag
+from edt.models import Base, Article, Tag, DBSession
 
 
 here = Path(os.path.dirname(__file__))
@@ -26,6 +25,7 @@ class BaseTestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
         Base.metadata.drop_all(cls.engine)
+        cls.session.remove()
 
     def setUp(self):
         self.config = testing.setUp()
@@ -33,13 +33,15 @@ class BaseTestCase(TestCase):
     def tearDown(self):
         for t in reversed(Base.metadata.sorted_tables):
             self.session.execute(t.delete())
-        self.session.remove()
+        self.session.close()
         testing.tearDown()
 
 
 class fixture:
     def insert(self):
-        self.article_data = [Article(title=f'title{i}', body=f'body{i}') for i in range(10)]
+        self.article_data = [
+            Article(title=f'title{i}', body=f'body{i}') for i in range(10)
+        ]
         self.tag_data = [Tag(name=f'tag{i}') for i in range(10)]
         self.session.add_all(self.article_data)
         self.session.add_all(self.tag_data)

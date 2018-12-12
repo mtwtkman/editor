@@ -1,6 +1,9 @@
 from sqlalchemy.sql.expression import desc
 import graphene
-from graphene import ObjectType, Schema, List, Field, Int, String, InputObjectType, Boolean
+from graphene import (
+    ObjectType, Schema, List, Field, Int,
+    String, InputObjectType, Boolean,
+)
 from graphene_sqlalchemy import SQLAlchemyObjectType
 
 from . import models
@@ -35,11 +38,11 @@ class Query(ObjectType):
 
     def resolve_article(self, info, id):
         query = Article.get_query(info)
-        return query.filter(models.Article.id==id).one()
+        return query.filter(models.Article.id == id).one()
 
     def resolve_tag(self, info, name):
         query = Tag.get_query(info)
-        return query.filter(models.Tag.name==name).one()
+        return query.filter(models.Tag.name == name).one()
 
 
 class TagInput(InputObjectType):
@@ -59,12 +62,16 @@ class CreateArticle(graphene.Mutation):
 
     Output = Article
 
-    def mutate(self, info, article, tags):
-
-        import pdb; pdb.set_trace()
-
-        session.add(models.Article(**article))
-        created = session.query(models.Article).order_by(desc(models.Article.id)).first()
+    def mutate(self, info, article, tags=None):
+        tag_data = [models.Tag(**t) for t in tags or []]
+        stmt = models.Tag.__table__.insert(bind=session.bind) \
+            .prefix_with('OR IGNORE').values(tags)
+        session.execute(stmt)
+        data = models.Article(**article)
+        data.tags = tag_data
+        session.add(data)
+        created = session.query(models.Article) \
+            .order_by(desc(models.Article.id)).first()
         return created
 
 

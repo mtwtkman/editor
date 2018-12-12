@@ -1,8 +1,6 @@
-import transaction
-
 from sqlalchemy import update
 
-from edt.models import Article, Tag
+from edt.models import Article
 from tests.base import BaseTestCase, fixture, assertFields
 
 
@@ -27,7 +25,8 @@ class TestSelect(fixture, assertFields, BaseTestCase):
     def test_with_tag(self):
         for data in self.tagged_article_data:
             expected = [x.name for x in data.tags]
-            one = self.session.query(Article).filter(Article.title == data.title).one()
+            one = self.session.query(Article) \
+                .filter(Article.title == data.title).one()
             results = [x.name for x in one.tags]
 
             self.assertEqual(results, expected)
@@ -48,7 +47,9 @@ class TestInsert(BaseTestCase):
         published = False
         self.data.published = published
         self.session.add(self.data)
-        result = self.session.query(Article.published).filter(Article.title == self.data.title).scalar()
+        result = self.session \
+            .query(Article.published) \
+            .filter(Article.title == self.data.title).scalar()
         self.assertEqual(result, published)
 
 
@@ -59,7 +60,8 @@ class TestDelete(BaseTestCase):
         self.session.add(self.data)
 
     def test_success(self):
-        target = self.session.query(Article).filter(Article.title == self.data.title).one()
+        target = self.session.query(Article) \
+            .filter(Article.title == self.data.title).one()
         before = self.session.query(Article).count()
         self.session.delete(target)
         after = self.session.query(Article).count()
@@ -75,7 +77,10 @@ class TestUpdate(BaseTestCase):
 
     def test_title(self):
         title = f'x{self.data.title}'
-        stmt = update(Article).where(Article.id == self.target.id).values(title=title)
+        stmt = update(Article) \
+            .where(Article.id == self.target.id) \
+            .values(title=title)
         self.session.execute(stmt)
-        result = self.session.query(Article.title).filter(Article.id == self.target.id).scalar()
+        result = self.session \
+            .query(Article.title).filter(Article.id == self.target.id).scalar()
         self.assertEqual(result, title)
