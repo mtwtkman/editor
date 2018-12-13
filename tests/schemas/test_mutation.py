@@ -1,3 +1,5 @@
+from unittest import skip
+
 import pytest
 
 from tests.base import BaseTestCase
@@ -21,7 +23,7 @@ class TestMutation(CallFunc, BaseTestCase):
         title,
         body,
         tags=None,
-        fields=['id', 'title', 'body', 'published', 'createdAt']
+        fields=['id', 'title', 'body', 'published', 'createdAt'],
     ):
         article_arg = f'''article: {{title: "{title}", body: "{body}"}}'''
         tags_arg = f', tags: {self.t(tags)}' if tags else ''
@@ -48,7 +50,6 @@ class TestMutation(CallFunc, BaseTestCase):
         result = self._callFUT(self.q(title, body))
         self.assertProps(result, {'title': title, 'body': body, 'tags': []})
 
-    @pytest.mark.only
     def test_new_article_with_new_tags(self):
         title = 'hoge'
         body = 'fuga'
@@ -62,6 +63,7 @@ class TestMutation(CallFunc, BaseTestCase):
         ))
         self.assertProps(result, {'title': title, 'body': body, 'tags': tags})
 
+    @pytest.mark.only
     def test_new_article_with_existed_tags(self):
         title = 'hoge'
         body = 'fuga'

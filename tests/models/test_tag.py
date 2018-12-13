@@ -47,7 +47,8 @@ class TestDelete(BaseTestCase):
         self.session.add(self.data)
 
     def test_success(self):
-        target = self.session.query(Tag).filter(Tag.name == self.data.name).one()
+        target = self.session.query(Tag) \
+            .filter(Tag.name == self.data.name).one()
         before = self.session.query(Tag).count()
         self.session.delete(target)
         after = self.session.query(Tag).count()

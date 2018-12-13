@@ -48,6 +48,7 @@ class fixture:
         self.tagged_tag_data = self.tag_data[:3]
         for x in self.tagged_article_data:
             x.tags = self.tagged_tag_data
+        self.session.flush()
 
 
 class assertFields:
