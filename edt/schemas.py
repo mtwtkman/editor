@@ -55,13 +55,18 @@ class ArticleInput(InputObjectType):
     published = Boolean()
 
 
-class CreateArticle(graphene.Mutation):
+class ArticleMutationBase(graphene.Mutation):
     class Arguments:
         article = ArticleInput(required=True)
         tags = List(TagInput)
 
     Output = Article
 
+    def mutate(self, info, article, tags=None):
+        raise NotImplementedError
+
+
+class CreateArticle(ArticleMutationBase):
     def mutate(self, info, article, tags=None):
         tag_data = []
         for t in tags or []:
