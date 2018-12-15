@@ -12,7 +12,12 @@ from sqlalchemy import (
     Table,
 )
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import scoped_session, sessionmaker, relationship
+from sqlalchemy.orm import (
+    scoped_session,
+    sessionmaker,
+    relationship,
+    backref,
+)
 from zope.sqlalchemy import ZopeTransactionExtension
 
 
@@ -42,7 +47,11 @@ class Article(Base):
     created_at = Column(TIMESTAMP, default=datetime.now, nullable=False)
     updated_at = Column(TIMESTAMP, default=datetime.now, nullable=False)
 
-    tags = relationship('Tag', secondary=taggings, backref='articles')
+    tags = relationship(
+        'Tag',
+        secondary=taggings,
+        backref='articles',
+    )
 
 
 class Tag(Base):

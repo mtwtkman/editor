@@ -63,10 +63,15 @@ class CreateArticle(graphene.Mutation):
     Output = Article
 
     def mutate(self, info, article, tags=None):
-        tag_data = [models.Tag(**t) for t in tags or []]
-        stmt = models.Tag.__table__.insert(bind=session.bind) \
-            .prefix_with('OR IGNORE').values(tags)
-        session.execute(stmt)
+        tag_data = []
+        for t in tags or []:
+            tag = session.query(models.Tag) \
+                .filter(models.Tag.name == t['name']) \
+                .first() or models.Tag(**t)
+            if tag not in session:
+                session.add(tag)
+                session.flush()
+            tag_data.append(tag)
         data = models.Article(**article)
         data.tags = tag_data
         session.add(data)

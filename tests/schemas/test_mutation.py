@@ -1,7 +1,3 @@
-from unittest import skip
-
-import pytest
-
 from tests.base import BaseTestCase
 from edt.models import Article, Tag
 from tests.schemas.base import CallFunc
@@ -63,7 +59,6 @@ class TestMutation(CallFunc, BaseTestCase):
         ))
         self.assertProps(result, {'title': title, 'body': body, 'tags': tags})
 
-    @pytest.mark.only
     def test_new_article_with_existed_tags(self):
         title = 'hoge'
         body = 'fuga'
@@ -75,4 +70,7 @@ class TestMutation(CallFunc, BaseTestCase):
             ['id', 'title', 'body', 'published',
                 'createdAt', 'tags {\nname\n}'],
         ))
+        self.assertTrue(
+            len(self.session.execute('select * from taggings').fetchall()) > 0
+        )
         self.assertProps(result, {'title': title, 'body': body, 'tags': tags})
