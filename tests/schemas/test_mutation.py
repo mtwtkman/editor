@@ -3,34 +3,15 @@ from edt.models import Article, Tag
 from tests.schemas.base import CallFunc
 
 
-class TestMutation(CallFunc, BaseTestCase):
+class TestCreateArticle(CallFunc, BaseTestCase):
+    meth = 'createArticle'
+
     def setUp(self):
         super().setUp()
         self.x = 1
         self.created_tag_name = 'x'
         self.session.add(Tag(name=self.created_tag_name))
         self.session.flush()
-
-    def t(self, tags):
-        return f'''[{','.join([f'{{name: "{t}"}}' for t in tags])}]'''
-
-    def q(
-        self,
-        title,
-        body,
-        tags=None,
-        fields=['id', 'title', 'body', 'published', 'createdAt'],
-    ):
-        article_arg = f'''article: {{title: "{title}", body: "{body}"}}'''
-        tags_arg = f', tags: {self.t(tags)}' if tags else ''
-        fields = '\n'.join(fields)
-        return f'''
-        mutation AddNewArticle {{
-            createArticle({article_arg}{tags_arg}) {{
-                {fields}
-            }}
-        }}
-        '''
 
     def assertProps(self, result, expected):
         created = self.session.query(Article) \
@@ -43,7 +24,7 @@ class TestMutation(CallFunc, BaseTestCase):
     def test_new_article(self):
         title = 'hoge'
         body = 'fuga'
-        result = self._callFUT(self.q(title, body))
+        result = self._callFUT(self.q(title=title, body=body))
         self.assertProps(result, {'title': title, 'body': body, 'tags': []})
 
     def test_new_article_with_new_tags(self):
@@ -51,11 +32,13 @@ class TestMutation(CallFunc, BaseTestCase):
         body = 'fuga'
         tags = ['a', 'b']
         result = self._callFUT(self.q(
-            title,
-            body,
-            tags,
-            ['id', 'title', 'body', 'published',
-                'createdAt', 'tags {\nname\n}'],
+            title=title,
+            body=body,
+            tags=tags,
+            fields=[
+                'id', 'title', 'body', 'published',
+                'createdAt', 'tags {\nname\n}'
+            ],
         ))
         self.assertProps(result, {'title': title, 'body': body, 'tags': tags})
 
@@ -64,13 +47,31 @@ class TestMutation(CallFunc, BaseTestCase):
         body = 'fuga'
         tags = [self.created_tag_name, 'a']
         result = self._callFUT(self.q(
-            title,
-            body,
-            tags,
-            ['id', 'title', 'body', 'published',
-                'createdAt', 'tags {\nname\n}'],
+            title=title,
+            body=body,
+            tags=tags,
+            fields=[
+                'id', 'title', 'body', 'published',
+                'createdAt', 'tags {\nname\n}'
+            ],
         ))
         self.assertTrue(
             len(self.session.execute('select * from taggings').fetchall()) > 0
         )
         self.assertProps(result, {'title': title, 'body': body, 'tags': tags})
+
+
+# class TestEditArticle(CallFunc, BaseTestCase):
+#     meth = 'editArticle'
+#
+#     def setUp(self):
+#         self.tag = Tag(name='tag1')
+#         self.session.add(self.tag)
+#         self.without_tag = Article(title='hoge', body='fuga')
+#         self.with_tag = Article(title='foo', body='bar')
+#         self.with_tag.tags.append(self.tag)
+#         self.session.add_all([self.without_tag, self.with_tag])
+#         self.session.flush()
+#
+#     def test_update_title_for_without_tag_article(self):
+#         pass
