@@ -1,9 +1,12 @@
 from tests.base import BaseTestCase, fixture
-from tests.schemas.base import CallFunc
+from tests.schema.base import CallFunc
 from edt.models import Article, Tag
 
 
 class TestQuery(fixture, CallFunc, BaseTestCase):
+    from edt.schema.query import Query
+    root_cls = Query
+
     def setUp(self):
         super().setUp()
         self.insert()

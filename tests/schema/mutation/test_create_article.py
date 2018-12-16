@@ -1,10 +1,13 @@
 from tests.base import BaseTestCase
 from edt.models import Article, Tag
-from tests.schemas.base import CallFunc
+from tests.schema.base import CallFunc
 
 
 class TestCreateArticle(CallFunc, BaseTestCase):
     meth = 'createArticle'
+
+    from edt.schema.mutation import CreateArticle
+    root_cls = CreateArticle
 
     def setUp(self):
         super().setUp()
@@ -15,7 +18,7 @@ class TestCreateArticle(CallFunc, BaseTestCase):
 
     def assertProps(self, result, expected):
         created = self.session.query(Article) \
-            .filter(Article.id == result.data['createArticle']['id']).one()
+            .filter(Article.id == result.data[self.meth]['id']).one()
         self.assertEqual(created.title, expected['title'])
         self.assertEqual(created.body, expected['body'])
         self.assertEqual([x.name for x in created.tags], expected['tags'])
@@ -59,19 +62,3 @@ class TestCreateArticle(CallFunc, BaseTestCase):
             len(self.session.execute('select * from taggings').fetchall()) > 0
         )
         self.assertProps(result, {'title': title, 'body': body, 'tags': tags})
-
-
-# class TestEditArticle(CallFunc, BaseTestCase):
-#     meth = 'editArticle'
-#
-#     def setUp(self):
-#         self.tag = Tag(name='tag1')
-#         self.session.add(self.tag)
-#         self.without_tag = Article(title='hoge', body='fuga')
-#         self.with_tag = Article(title='foo', body='bar')
-#         self.with_tag.tags.append(self.tag)
-#         self.session.add_all([self.without_tag, self.with_tag])
-#         self.session.flush()
-#
-#     def test_update_title_for_without_tag_article(self):
-#         pass

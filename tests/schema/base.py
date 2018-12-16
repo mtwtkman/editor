@@ -1,7 +1,7 @@
 class CallFunc:
     def _callFUT(self, q):
-        from edt.schemas import schema as testFunc
-        return testFunc.execute(q)
+        from edt.schema import schema as testFunc
+        return testFunc.execute(q, root=self.root_cls)
 
     def t(self, tags):
         return f'''[{','.join([f'{{name: "{t}"}}' for t in tags])}]'''

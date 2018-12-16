@@ -16,9 +16,14 @@ tests_require = [
     'pytest-only',
 ]
 
+dev_require = [
+    'mypy',
+]
+
 
 extras_require = {
     'test': tests_require,
+    'dev': dev_require,
 }
 
 setup(

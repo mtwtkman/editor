@@ -12,3 +12,4 @@ elm-stuff
 v
 edt.egg-info
 test-blog.db
+.mypy_cache
