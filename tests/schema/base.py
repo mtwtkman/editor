@@ -11,6 +11,7 @@ class CallFunc:
         id_=None,
         title=None,
         body=None,
+        published=None,
         tags=None,
         fields=['id', 'title', 'body', 'published', 'createdAt'],
     ):
