@@ -1,60 +1,51 @@
 from sqlalchemy.sql.expression import desc
-import graphene
-from graphene import ObjectType, List
+from graphene import ObjectType, List, Int, Mutation
 
 from .. import models
 from . import session
 from .type import Article, ArticleInput, TagInput
 
 
-class ArticleMutationBase(graphene.Mutation):
+def traverse(tags):
+    for t in tags:
+        tag = session.query(models.Tag) \
+            .filter(models.Tag.name == t['name']) \
+            .first() or models.Tag(**t)
+        if tag not in session:
+            session.add(tag)
+            session.flush()
+        yield tag
+
+
+class ArticleOutput:
+    Output = Article
+
+
+class CreateArticle(ArticleOutput, Mutation):
     class Arguments:
         article = ArticleInput(required=True)
         tags = List(TagInput)
 
-    Output = Article
-
     def mutate(source, info, article, tags=None):
-        data = source.data_factory(article)
+        data = models.Article(**article)
         if tags:
-            data.tags = list(source.traverse(tags))
+            data.tags = list(traverse(tags))
         session.add(data)
-        return source.fetch_one()
-
-    @staticmethod
-    def data_factory(article):
-        raise NotImplementedError
-
-    @staticmethod
-    def fetch_one():
-        raise NotImplementedError
-
-    @staticmethod
-    def traverse(tags):
-        for t in tags:
-            tag = session.query(models.Tag) \
-                .filter(models.Tag.name == t['name']) \
-                .first() or models.Tag(**t)
-            if tag not in session:
-                session.add(tag)
-                session.flush()
-            yield tag
-
-
-class CreateArticle(ArticleMutationBase):
-    @staticmethod
-    def data_factory(article):
-        return models.Article(**article)
-
-    @staticmethod
-    def fetch_one():
         return session.query(models.Article) \
             .order_by(desc(models.Article.id)).first()
 
 
-class UpdateArticle(ArticleMutationBase):
-    def mutate(self, info, article, tags=None):
-        tag_data = []
+class UpdateArticle(ArticleOutput, Mutation):
+    class Arguments:
+        id = Int(required=True)
+        article = ArticleInput(required=True)
+        tags = List(TagInput)
+
+    def mutate(source, info, id_, article, tags=None):
+
+        import pdb; pdb.set_trace()
+
+        print(0)
 
 
 class Mutation(ObjectType):
